@@ -1,0 +1,61 @@
+# Use powerline
+USE_POWERLINE="true"
+# Source manjaro-zsh-configuration
+if [[ -e /usr/share/zsh/manjaro-zsh-config ]]; then
+  source /usr/share/zsh/manjaro-zsh-config
+fi
+# Use manjaro zsh prompt
+if [[ -e /usr/share/zsh/manjaro-zsh-prompt ]]; then
+  source /usr/share/zsh/manjaro-zsh-prompt
+fi
+
+if [ -x "$(command -v exa)" ]; then
+    alias la="exa --long --all --group"
+fi
+
+alias df='df -h'
+alias free='free -h'
+alias pipes='pipes.sh'
+alias ls='exa --icons -l'
+alias acc='arduino-cli compile --fqbn arduino:avr:uno'
+alias rm='rm -i'
+alias v='vim'
+alias processing-java='~/Downloads/processing-4.0b2-linux64/processing-4.0b2/processing-java'
+
+export GTK_THEME=Sweet-Dark-v40
+export PATH="$HOME/.cargo/bin:$PATH"
+export PATH="/var/lib/snapd/snap/bin:$PATH"
+# random fortune with cowsay
+# fortune | cowsay -f $(bat ~/.config/cows | shuf -n 1) | lolcat -s 10
+# colorscript random
+
+# fm6000 -r
+neofetch
+dual (){
+  # xrandr --output eDP-1 --right-of VGA-1 --output HDMI-1 --auto
+  xrandr --output eDP-1 --off
+  nitrogen --restore
+}
+
+conda_init (){
+  # >>> conda initialize >>>
+  # !! Contents within this block are managed by 'conda init' !!
+  __conda_setup="$('/home/kshitij/anaconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+  if [ $? -eq 0 ]; then
+      eval "$__conda_setup"
+  else
+      if [ -f "/home/kshitij/anaconda3/etc/profile.d/conda.sh" ]; then
+          . "/home/kshitij/anaconda3/etc/profile.d/conda.sh"
+      else
+          export PATH="/home/kshitij/anaconda3/bin:$PATH"
+      fi
+  fi
+  unset __conda_setup
+  # <<< conda initialize <<
+
+  export PATH="/home/kshitij/anaconda3/bin:$PATH"
+}
+conda_init
+source /home/kshitij/.config/broot/launcher/bash/br
+bindkey -v
+

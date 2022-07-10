@@ -1,0 +1,27 @@
+{
+    "wallpaper": "/home/kshitij/Wallpapers/colors.jpg",
+    "alpha": "100",
+    "special": {
+        "background": "#010101",
+        "foreground": "#84cff6",
+        "cursor": "#84cff6"
+    },
+    "colors": {
+        "color0": "#010101",
+        "color1": "#A3FE1D",
+        "color2": "#A7FB26",
+        "color3": "#487998",
+        "color4": "#FF1BA2",
+        "color5": "#F621A2",
+        "color6": "#2A9ED1",
+        "color7": "#84cff6",
+        "color8": "#5c90ac",
+        "color9": "#A3FE1D",
+        "color10": "#A7FB26",
+        "color11": "#487998",
+        "color12": "#FF1BA2",
+        "color13": "#F621A2",
+        "color14": "#2A9ED1",
+        "color15": "#84cff6"
+    }
+}

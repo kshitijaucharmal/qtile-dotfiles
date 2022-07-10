@@ -29,12 +29,14 @@ import os, subprocess
 from libqtile import hook
 
 from libqtile import bar, layout, widget
-from libqtile.config import Click, Drag, Group, Key, Match, Screen
+from libqtile.config import Click, Drag, Group, Key, Match, Screen, EzKey as EK
 from libqtile.lazy import lazy
 from libqtile.utils import guess_terminal
 from libqtile import qtile
 
 mod = "mod4"
+browser = "brave"
+file_manager = "nautilus"
 terminal = guess_terminal()
 
 @hook.subscribe.startup_once
@@ -44,96 +46,79 @@ def autostart():
 
 keys = [
     # Switch between windows
-    Key([mod], "h", lazy.layout.left(), desc="Move focus to left"),
-    Key([mod], "l", lazy.layout.right(), desc="Move focus to right"),
-    Key([mod], "j", lazy.layout.down(), desc="Move focus down"),
-    Key([mod], "k", lazy.layout.up(), desc="Move focus up"),
-    Key([mod], "Tab", lazy.layout.next(),
-        desc="Move window focus to other window"),
-    Key([mod], "z", lazy.window.toggle_fullscreen()),
-
+    EK("M-h", lazy.layout.left(), desc="Move focus to left"),
+    EK("M-l", lazy.layout.right(), desc="Move focus to right"),
+    EK("M-j", lazy.layout.down(), desc="Move focus down"),
+    EK("M-k", lazy.layout.up(), desc="Move focus up"),
+    EK("M-<Tab>", lazy.layout.next(), desc="Move window focus to other window"),
+    EK("M-z", lazy.window.toggle_fullscreen()),
+    
     # Move windows between left/right columns or move up/down in current stack.
     # Moving out of range in Columns layout will create new column.
-    Key([mod, "shift"], "h", lazy.layout.shuffle_left(),
-        desc="Move window to the left"),
-    Key([mod, "shift"], "l", lazy.layout.shuffle_right(),
-        desc="Move window to the right"),
-    Key([mod, "shift"], "j", lazy.layout.shuffle_down(),
-        desc="Move window down"),
-    Key([mod, "shift"], "k", lazy.layout.shuffle_up(), desc="Move window up"),
+    EK("M-S-h", lazy.layout.shuffle_left(), desc="Move window to the left"),
+    EK("M-S-l", lazy.layout.shuffle_right(), desc="Move window to the right"),
+    EK("M-S-j", lazy.layout.shuffle_down(), desc="Move window down"),
+    EK("M-S-k", lazy.layout.shuffle_up(), desc="Move window up"),
 
     # Grow windows. If current window is on the edge of screen and direction
     # will be to screen edge - window would shrink.
-    Key([mod, "control"], "h", lazy.layout.grow_left(),
-        desc="Grow window to the left"),
-    Key([mod, "control"], "l", lazy.layout.grow_right(),
-        desc="Grow window to the right"),
-    Key([mod, "control"], "j", lazy.layout.grow_down(),
-        desc="Grow window down"),
-    Key([mod, "control"], "k", lazy.layout.grow_up(), desc="Grow window up"),
-    Key([mod], "n", lazy.layout.normalize(), desc="Reset all window sizes"),
+    EK("M-C-h", lazy.layout.grow_left(), desc="Grow window to the left"),
+    EK("M-C-l", lazy.layout.grow_right(), desc="Grow window to the right"),
+    EK("M-C-j", lazy.layout.grow_down(), desc="Grow window down"),
+    EK("M-C-k", lazy.layout.grow_up(), desc="Grow window up"),
+    EK("M-n", lazy.layout.normalize(), desc="Reset all window sizes"),
 
     # Toggle between split and unsplit sides of stack.
     # Split = all windows displayed
     # Unsplit = 1 window displayed, like Max layout, but still with
     # multiple stack panes
-    Key([mod, "shift"], "Return", lazy.layout.toggle_split(),
-        desc="Toggle between split and unsplit sides of stack"),
-    Key([mod], "Return", lazy.spawn(terminal), desc="Launch terminal"),
+    EK("M-S-<Return>", lazy.layout.toggle_split(), desc="Toggle between split and unsplit sides of stack"),
+    EK("M-<Return>", lazy.spawn(terminal), desc="Launch terminal"),
 
     # Toggle between different layouts as defined below
-    Key([mod], "space", lazy.next_layout(), desc="Toggle between layouts"),
-    Key([mod], "c", lazy.window.kill(), desc="Kill focused window"),
+    EK("M-<space>", lazy.next_layout(), desc="Toggle between layouts"),
+    EK("M-q", lazy.window.kill(), desc="Kill focused window"),
 
-    Key([mod], "q", lazy.restart(), desc="Restart Qtile"),
-    Key([mod, "shift"], "q", lazy.shutdown(), desc="Shutdown Qtile"),
-    Key([mod], "r", lazy.spawncmd(),
+    EK("M-<F5>", lazy.restart(), desc="Restart Qtile"),
+    EK("M-S-q", lazy.shutdown(), desc="Shutdown Qtile"),
+    EK("M-r", lazy.spawncmd(),
         desc="Spawn a command using a prompt widget"),
 
     # my shortcuts
-    Key([mod], "s", lazy.spawn("snap run spotify")),
-    Key([mod], "e", lazy.spawn("nautilus")),
-    Key([mod], "b", lazy.spawn("blender")),
-    Key([mod], "f", lazy.spawn("brave")),
-    Key([mod], "v", lazy.spawn("midori")),
-    Key([mod, "shift"], "x", lazy.spawn("systemctl poweroff")),
-    Key([mod, "shift"], "z", lazy.spawn("systemctl reboot")),
-    Key(["control"], "space",  lazy.spawn("rofi -show drun")),
-    Key([mod], "u", lazy.spawn("~/Applications/UnityHub.AppImage")), 
-    Key([mod, "shift"], "l", lazy.spawn("quicklinks")),
-    Key([mod], "a", lazy.spawn("apps")),
+    EK("M-s", lazy.spawn("spotify")),
+    EK("M-b", lazy.spawn("blender")),
+    EK("M-e", lazy.spawn(file_manager)),
+    EK("M-f", lazy.spawn(browser)),
+
+    # powershortcuts
+    EK("M-S-x", lazy.spawn("systemctl poweroff")),
+    EK("M-S-z", lazy.spawn("systemctl reboot")),
+
+    # rofi launcher
+    EK("C-<space>",  lazy.spawn("rofi -show drun")),
+    EK("M-S-p",  lazy.spawn("rofi-pass --last-used")),
     
     # Screenshot
-    Key([],   "Print", lazy.spawn("flameshot gui")),
+    EK("<Print>", lazy.spawn("flameshot full")),
+    EK("S-<Print>", lazy.spawn("flameshot gui")),
 
     # audio and brightness
-    Key([mod, "shift"], "Right", lazy.spawn("amixer set Master 5%+ unmute")),
-    Key([mod, "shift"], "Left", lazy.spawn("amixer set Master 5%- unmute")),
-    Key([mod, "shift"], "Up", lazy.spawn("lux -a 5%")),
-    Key([mod, "shift"], "Down", lazy.spawn("lux -s 5%")),
+    EK("M-S-<Right>", lazy.spawn("amixer set Master 5%+ unmute")),
+    EK("M-S-<Left>", lazy.spawn("amixer set Master 5%- unmute")),
+    EK("M-S-<Up>", lazy.spawn("lux -a 5%")),
+    EK("M-S-<Down>", lazy.spawn("lux -s 5%")),
 
     # colorpicker
-    Key([mod], 'x', lazy.spawn('xcolor-pick')),
+    EK("M-x", lazy.spawn('xcolor-pick')),
 
     # Function keys
-    Key([], "F3", lazy.spawn("systemctl suspend")),
-    Key([], "F6", lazy.spawn("amixer set Master 5%- unmute")),
-    Key([], "F7", lazy.spawn("amixer set Master 5%+ unmute")),
-    Key([], "F9", lazy.spawn("lux -s 5%")),
-    Key([], "F10", lazy.spawn("lux -a 5%")),
+    EK("<F3>", lazy.spawn("systemctl suspend")),
+    EK("<F6>", lazy.spawn("amixer set Master 5%- unmute")),
+    EK("<F7>", lazy.spawn("amixer set Master 5%+ unmute")),
+    EK("<F9>", lazy.spawn("lux -s 5%")),
+    EK("<F10>", lazy.spawn("lux -a 5%")),
 ]
 
-# Colors
-colors = [["#23202A", "#23202A"], # panel background
-          ["#44414B", "#44414B"], # background for current screen tab
-          ["#ffffff", "#ffffff"], # font color for group names
-          ["#101015", "#101015"], # border line color for current tab
-          ["#CCFF00", "#CCFF00"], # border line color for 'other tabs' and color for 'odd widgets'
-          ["#121015", "#121015"], # color for the 'even widgets'
-          ["#AEDA01", "#AEDA01"], # window name
-          ["#ffffff", "#ffffff"]] # backbround for inactive screens
-
-WHITE='#FFFFFF'
 
 groups = [Group(i) for i in [
     "", "", "", "", "", "",
@@ -152,10 +137,10 @@ layouts = [
     #layout.Columns(border_focus_stack=['#d75f5f', '#8f3d3d'], border_width=4),
     # layout.Max(),
     layout.MonadTall(
-    	fontsize = 10,
-    	margin = 2,
+        fontsize = 10,
+        margin = 2,
         name = 'Xmonad Tall',
-        border_focus = '0597F2',
+        border_focus = 'C74045',
     ),
     layout.TreeTab(
         active_bg = 'b00000',
@@ -170,8 +155,8 @@ layouts = [
         padding_left = 0,
     ),
     # layout.MonadWide(
-    # 	fontsize = 10,
-    # 	margin = 8,
+    #   fontsize = 10,
+    #   margin = 8,
     #     name = 'Xmonad Wide'
     # ),
     layout.Bsp(
@@ -189,143 +174,7 @@ layouts = [
     # layout.Zoomy(),
 ]
 
-widget_defaults = dict(
-    font='Ubuntu Mono',
-    fontsize=14,
-    padding=2,
-    background='000000aa',
-)
-extension_defaults = widget_defaults.copy()
-
-# This is the bar, or the panel, and the widgets within the bar.
-def init_widgets_list():
-    widgets_list = [
-              widget.Sep(
-                       linewidth = 0,
-                       padding = 6,
-                       foreground = colors[2],
-                       background = colors[0],
-                       ),
-              widget.GroupBox(
-                       font = "Ubuntu Bold",
-                       fontsize = 14,
-                       margin_y = 3,
-                       margin_x = 0,
-                       padding_y = 5,
-                       padding_x = 3,
-                       borderwidth = 3,
-                       active = '#ff4444',
-                       inactive = colors[7],
-                       rounded = True,
-                       highlight_color = colors[1],
-                       highlight_method = "line",
-                       this_current_screen_border = colors[4],
-                       this_screen_border = colors[6],
-                       other_current_screen_border = colors[6],
-                       other_screen_border = colors[4],
-                       foreground = colors[2],
-                       background = colors[0]
-                       ),
-              widget.Sep(
-                       linewidth = 0,
-                       padding = 6,
-                       foreground = colors[2],
-                       background = colors[0]
-                       ),
-              widget.WindowName(
-                       foreground = colors[6],
-                       background = colors[0],
-                       padding = 0,
-                       font = "Ubuntu Mono Bold",
-                       fontsize = 14
-                       ),
-              widget.Systray(
-                       background = colors[0],
-                       padding = 5
-                       ),
-             widget.Net(
-                       interface = "wlo1",
-                       format = '{down}↓↑{up}',
-                       foreground = "#121015",
-                       background = colors[4],
-                       padding = 5,
-                       font = "Ubuntu Mono Bold",
-                       fontsize = 12,
-                       mouse_callbacks = {'Button1': lambda: qtile.cmd_spawn('gnome-control-center wifi')},
-                       ),
-              widget.TextBox(
-                       text = " ⟳",
-                       padding = 2,
-                       foreground = WHITE, 
-                       background = colors[3],
-                       font = "Ubuntu Mono Bold",
-                       fontsize = 14
-                       ),
-              widget.CheckUpdates(
-                       update_interval = 1800,
-                       distro = "Arch_checkupdates",
-                       font = "Ubuntu Mono Bold",
-                       display_format = "{updates}",
-                       foreground = WHITE,
-                       mouse_callbacks = {'Button1': lambda: qtile.cmd_spawn('alacritty -e sudo pacman -Syu')},
-                       background = colors[3],
-                       ),
-                widget.TextBox(
-                         text = " 🖬",
-                         foreground = "#121015",
-                         background = colors[4],
-                         padding = 0,
-                       font = "Ubuntu Mono Bold",
-                         fontsize = 14
-                         ),
-                widget.Memory(
-                		   update_interval = 10,
-                         foreground = "#121015",
-                         background = colors[4],
-                         mouse_callbacks = {'Button1': lambda: qtile.cmd_spawn('alacritty -e bpytop')},
-                       font = "Ubuntu Mono Bold",
-                         padding = 5
-                         ),
-              widget.TextBox(
-                      text = " Vol:",
-                       foreground = WHITE,
-                       background = colors[3],
-                       font = "Ubuntu Mono Bold",
-                       padding = 0
-                       ),
-              widget.Volume(
-                       foreground = WHITE,
-                       background = colors[3],
-                       font = "Ubuntu Mono Bold",
-                       padding = 5
-                       ),
-              widget.CurrentLayout(
-                       foreground = "#121015",
-                       background = colors[4],
-                       padding = 5,
-                       font = "Ubuntu Mono Bold",
-                       fontsize = 14
-                       ),
-              widget.Clock(
-                       foreground = WHITE,
-                       background = colors[3],
-                       format = "%a, %b %_d (%I:%M) %p ",
-                       font = "Ubuntu Mono Bold",
-                       fontsize = 14
-                       ),
-              widget.Battery(
-              	       foreground = "#121015",
-                       background = colors[4],
-                       format = '{char} {percent:2.0%} ',
-                       font = "Ubuntu Mono Bold",
-                       mouse_callbacks = {'Button1': lambda: qtile.cmd_spawn('gnome-control-center power')},
-              	       ),
-              ]
-    return widgets_list
-
-screens = [
-    Screen(top=bar.Bar(widgets=init_widgets_list(), opacity=0.85, size=18)),
-]
+screens = []
 
 # Drag floating layouts.
 mouse = [

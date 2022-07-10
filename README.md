@@ -1,1 +1,1 @@
-# qtile-dotfiles
+# README
